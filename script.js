@@ -1,12 +1,7 @@
 /* eslint-disable linebreak-style */
-/* eslint-disable consistent-return */
-/* eslint-disable no-param-reassign */
-/* eslint-disable linebreak-style */
-/* eslint-disable no-mixed-spaces-and-tabs */
-/* eslint-disable linebreak-style */
 /* eslint-disable import/extensions */
 import jsonKeyboardEn from './dataEn.js';
-//import jsonKeyboardRu from './dataRu.js';
+// import jsonKeyboardRu from './dataRu.js';
 
 let jsonKeyboard = jsonKeyboardEn;
 const body = document.querySelector('body');
@@ -112,6 +107,7 @@ function findKey(code) {
       if (jsonKeyboard[i][j].code === code) return jsonKeyboard[i][j];
     }
   }
+  return null;
 }
 
 function enterClicked() {
@@ -141,10 +137,11 @@ function capslockClicked() {
   if (shiftState === 0) shiftState = 1;
   else shiftState = 0;
   btnSymbols.forEach((el) => {
+    const elt = el;
     if (shiftState === 0) {
-      el.innerHTML = findKey(el.id).name;
+      elt.innerHTML = findKey(elt.id).name;
     } else {
-      el.innerHTML = findKey(el.id).nameShift;
+      elt.innerHTML = findKey(elt.id).nameShift;
     }
   });
   btnCapsLock.classList.toggle('pressed');
@@ -155,10 +152,11 @@ function shiftClicked() {
   if (shiftState === 0) shiftState = 1;
   else shiftState = 0;
   btnSymbols.forEach((el) => {
+    const elt = el;
     if (shiftState === 0) {
-      el.innerHTML = findKey(el.id).name;
+      elt.innerHTML = findKey(elt.id).name;
     } else {
-      el.innerHTML = findKey(el.id).nameShift;
+      elt.innerHTML = findKey(elt.id).nameShift;
     }
   });
 }
@@ -173,10 +171,10 @@ function altClicked() {
 
 function keyDown(event) {
   const k = findKey(event.code);
-  document.querySelector('#' + event.code).classList.add('pressed');
+  document.querySelector(`#${event.code}`).classList.add('pressed');
   if (k.property === 'printable') {
     event.preventDefault();
-    
+
     const t = inputText.value;
     let s;
     if (shiftState === 0) s = k.name;
@@ -187,10 +185,9 @@ function keyDown(event) {
 
 function keyUp(event) {
   const k = findKey(event.code);
-  document.querySelector('#' + event.code).classList.remove('pressed');
+  document.querySelector(`#${event.code}`).classList.remove('pressed');
   if (k.property === 'printable') {
     event.preventDefault();
-    
   } else if (k.key === 'Shift') shiftClicked();
 }
 
