@@ -1,7 +1,7 @@
 /* eslint-disable linebreak-style */
 /* eslint-disable import/extensions */
 import jsonKeyboardEn from './dataEn.js';
-// import jsonKeyboardRu from './dataRu.js';
+import jsonKeyboardRu from './dataRu.js';
 
 let jsonKeyboard = jsonKeyboardEn;
 const body = document.querySelector('body');
@@ -99,7 +99,9 @@ const btnAltR = document.querySelector('#AltRight');
 const btnSpace = document.querySelector('#Space');
 const btnSymbols = document.querySelectorAll('button[printable]');
 
+let lang = 'en';
 let shiftState = 0;
+let altState = 0;
 
 function findKey(code) {
   for (let i = 0; i < jsonKeyboard.length; i += 1) {
@@ -109,6 +111,45 @@ function findKey(code) {
   }
   return null;
 }
+
+function changeLetters() {
+  btnSymbols.forEach((el) => {
+    const elt = el;
+    if (shiftState === 0) {
+      elt.innerHTML = findKey(elt.id).name;
+    } else {
+      elt.innerHTML = findKey(elt.id).nameShift;
+    }
+  });
+}
+
+function setLang(langT) {
+  switch (langT) {
+    case 'en':
+      jsonKeyboard = jsonKeyboardEn;
+      break;
+    case 'ru':
+      jsonKeyboard = jsonKeyboardRu;
+      break;
+
+    default:
+      break;
+  }
+  changeLetters();
+}
+
+function setLocalStorage() {
+  localStorage.setItem('lang', lang);
+}
+window.addEventListener('beforeunload', setLocalStorage);
+
+function getLocalStorage() {
+  if (localStorage.getItem('lang')) {
+    lang = localStorage.getItem('lang');
+    setLang(lang);
+  }
+}
+window.addEventListener('load', getLocalStorage);
 
 function enterClicked() {
   const t = inputText.value;
@@ -136,29 +177,48 @@ function backspaceClicked() {
 function capslockClicked() {
   if (shiftState === 0) shiftState = 1;
   else shiftState = 0;
-  btnSymbols.forEach((el) => {
-    const elt = el;
-    if (shiftState === 0) {
-      elt.innerHTML = findKey(elt.id).name;
-    } else {
-      elt.innerHTML = findKey(elt.id).nameShift;
-    }
-  });
+  changeLetters();
   btnCapsLock.classList.toggle('pressed');
   btnCapsLock.classList.toggle('dark');
 }
+let langswitched = false;
+function shiftClicked(event) {
+  if (langswitched) {
+    if (event === 'up') langswitched = false;
+    return;
+  }
+  if (altState === 1) {
+    langswitched = true;
+    if (event === 'down') {
+      switch (lang) {
+        case 'en':
+          lang = 'ru';
+          break;
+        case 'ru':
+          lang = 'en';
+          break;
 
-function shiftClicked() {
+        default:
+          break;
+      }
+      setLang(lang);
+    }
+  } else {
+    if (shiftState === 0) shiftState = 1;
+    else shiftState = 0;
+    changeLetters();
+  }
+}
+
+function shiftUp(event) {
+  if (langswitched) {
+    if (event === 'up') langswitched = false;
+    return;
+  }
+
   if (shiftState === 0) shiftState = 1;
   else shiftState = 0;
-  btnSymbols.forEach((el) => {
-    const elt = el;
-    if (shiftState === 0) {
-      elt.innerHTML = findKey(elt.id).name;
-    } else {
-      elt.innerHTML = findKey(elt.id).nameShift;
-    }
-  });
+  changeLetters();
 }
 
 function ctrlClicked() {
@@ -166,29 +226,67 @@ function ctrlClicked() {
 }
 
 function altClicked() {
+  altState = 1;
+}
 
+function altUp() {
+  altState = 0;
 }
 
 function keyDown(event) {
+  event.preventDefault();
+  if (event.repeat === true) return;
   const k = findKey(event.code);
-  document.querySelector(`#${event.code}`).classList.add('pressed');
+  if (k === null) return;
+  if (k.key !== 'CapsLock') document.querySelector(`#${event.code}`).classList.add('pressed');
   if (k.property === 'printable') {
-    event.preventDefault();
-
     const t = inputText.value;
     let s;
     if (shiftState === 0) s = k.name;
     else s = k.nameShift;
     inputText.value = t + s;
-  } else if (k.key === 'Shift' && !event.repeat) shiftClicked();
+  } else if (!event.repeat) {
+    switch (k.key) {
+      case 'Shift':
+        shiftClicked('down');
+
+        break;
+      case 'Alt':
+        altClicked('down');
+
+        break;
+      case 'CapsLock':
+        capslockClicked();
+        break;
+
+      default:
+        break;
+    }
+  }
 }
 
 function keyUp(event) {
+  event.preventDefault();
+
   const k = findKey(event.code);
-  document.querySelector(`#${event.code}`).classList.remove('pressed');
-  if (k.property === 'printable') {
-    event.preventDefault();
-  } else if (k.key === 'Shift') shiftClicked();
+  if (k === null) return;
+
+  if (k.key !== 'CapsLock') document.querySelector(`#${event.code}`).classList.remove('pressed');
+  if (k.property !== 'printable') {
+    switch (k.key) {
+      case 'Shift':
+        shiftUp('up');
+
+        break;
+      case 'Alt':
+        altUp('up');
+
+        break;
+
+      default:
+        break;
+    }
+  }
 }
 
 function btnsClicked(event) {
@@ -199,20 +297,22 @@ function btnsClicked(event) {
   inputText.value = t + event.currentTarget.innerText;
 }
 
-document.addEventListener('keydown', keyDown);
-document.addEventListener('keyup', keyUp);
+inputText.addEventListener('keydown', keyDown);
+inputText.addEventListener('keyup', keyUp);
 btnEnter.addEventListener('click', enterClicked);
 btnTab.addEventListener('click', tabClicked);
 btnDel.addEventListener('click', delClicked);
 btnBackspace.addEventListener('click', backspaceClicked);
 btnCapsLock.addEventListener('click', capslockClicked);
 btnShiftL.addEventListener('mousedown', shiftClicked);
-btnShiftL.addEventListener('mouseup', shiftClicked);
+btnShiftL.addEventListener('mouseup', shiftUp);
 btnShiftR.addEventListener('mousedown', shiftClicked);
-btnShiftR.addEventListener('mouseup', shiftClicked);
+btnShiftR.addEventListener('mouseup', shiftUp);
 btnCtrlL.addEventListener('click', ctrlClicked);
 btnCtrlR.addEventListener('click', ctrlClicked);
-btnAltL.addEventListener('click', altClicked);
-btnAltR.addEventListener('click', altClicked);
+btnAltL.addEventListener('mousedown', altClicked);
+btnAltR.addEventListener('mousedown', altClicked);
+btnAltL.addEventListener('mouseup', altUp);
+btnAltR.addEventListener('mouseup', altUp);
 btnSpace.addEventListener('click', spaceClicked);
 btnSymbols.forEach((el) => el.addEventListener('click', btnsClicked));
