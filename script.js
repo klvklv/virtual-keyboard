@@ -151,27 +151,60 @@ function getLocalStorage() {
 }
 window.addEventListener('load', getLocalStorage);
 
+function getCursorPosition() {
+  let position = 0;
+  if ((inputText.selectionStart != null) && (inputText.selectionStart !== undefined)) {
+    position = inputText.selectionStart;
+  }
+  return position;
+}
+
+function insertSymbols(str) {
+  const position = getCursorPosition();
+  const leftPart = inputText.value.substring(0, position);
+  const rightPart = inputText.value.substring(position);
+  let strLen = str.length;
+  if (str === '\r\n') strLen = 1;
+  inputText.value = leftPart + str + rightPart;
+  inputText.focus();
+  inputText.setSelectionRange(position + strLen, position + strLen);
+}
+
+function btnsClicked(event) {
+  const { id } = event.currentTarget;
+  if (findKey(id).location > 0) return;
+  if (id === 'Enter' || id === 'Tab' || id === 'Space') return;
+  insertSymbols(event.currentTarget.innerHTML);
+}
+
 function enterClicked() {
-  const t = inputText.value;
-  inputText.value = `${t}\r\n`;
+  insertSymbols('\r\n');
 }
 
 function tabClicked() {
-  const t = inputText.value;
-  inputText.value = `${t}    `;
+  insertSymbols('    ');
 }
 
 function spaceClicked() {
-  const t = inputText.value;
-  inputText.value = `${t} `;
+  insertSymbols(' ');
 }
 
 function delClicked() {
-
+  const position = getCursorPosition();
+  inputText.value = inputText.value.substring(0, position)
+    + inputText.value.substring(position + 1);
+  inputText.focus();
+  inputText.setSelectionRange(position, position);
 }
 
 function backspaceClicked() {
-
+  const position = getCursorPosition();
+  if (position > 0) {
+    inputText.value = inputText.value.substring(0, position - 1)
+    + inputText.value.substring(position);
+    inputText.focus();
+    inputText.setSelectionRange(position - 1, position - 1);
+  }
 }
 
 function capslockClicked() {
@@ -240,23 +273,35 @@ function keyDown(event) {
   if (k === null) return;
   if (k.key !== 'CapsLock') document.querySelector(`#${event.code}`).classList.add('pressed');
   if (k.property === 'printable') {
-    const t = inputText.value;
     let s;
     if (shiftState === 0) s = k.name;
     else s = k.nameShift;
-    inputText.value = t + s;
+    insertSymbols(s);
   } else if (!event.repeat) {
     switch (k.key) {
       case 'Shift':
         shiftClicked('down');
-
         break;
       case 'Alt':
         altClicked('down');
-
         break;
       case 'CapsLock':
         capslockClicked();
+        break;
+      case ' ':
+        spaceClicked();
+        break;
+      case 'Enter':
+        enterClicked();
+        break;
+      case 'Delete':
+        delClicked();
+        break;
+      case 'Backspace':
+        backspaceClicked();
+        break;
+      case 'Tab':
+        tabClicked();
         break;
 
       default:
@@ -287,14 +332,6 @@ function keyUp(event) {
         break;
     }
   }
-}
-
-function btnsClicked(event) {
-  const { id } = event.currentTarget;
-  if (findKey(id).location > 0) return;
-  if (id === 'Enter' || id === 'Tab' || id === 'Space') return;
-  const t = inputText.value;
-  inputText.value = t + event.currentTarget.innerText;
 }
 
 inputText.addEventListener('keydown', keyDown);
