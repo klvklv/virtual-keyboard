@@ -630,8 +630,8 @@ const jsonKeyboardEn = [
     },
     {
       key: 'ArrowUp',
-      name: '&#9650',
-      nameShift: '&#9650',
+      name: '▲',
+      nameShift: '▲',
       keyCode: 38,
       code: 'ArrowUp',
       location: 0,
@@ -739,8 +739,8 @@ const jsonKeyboardEn = [
     },
     {
       key: 'ArrowLeft',
-      name: '&#9668',
-      nameShift: '&#9668',
+      name: '◄',
+      nameShift: '◄',
       keyCode: 37,
       code: 'ArrowLeft',
       location: 0,
@@ -754,8 +754,8 @@ const jsonKeyboardEn = [
     },
     {
       key: 'ArrowDown',
-      name: '&#9660',
-      nameShift: '&#9660',
+      name: '▼',
+      nameShift: '▼',
       keyCode: 40,
       code: 'ArrowDown',
       location: 0,
