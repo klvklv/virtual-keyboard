@@ -85,6 +85,7 @@ wrapper.appendChild(section4);
 body.appendChild(wrapper);
 
 const inputText = document.querySelector('textarea');
+const keyboard = document.querySelector('#keyboard');
 const btnEnter = document.querySelector('#Enter');
 const btnTab = document.querySelector('#Tab');
 const btnDel = document.querySelector('#Delete');
@@ -248,7 +249,6 @@ function shiftUp(event) {
     if (event === 'up') langswitched = false;
     return;
   }
-
   if (shiftState === 0) shiftState = 1;
   else shiftState = 0;
   changeLetters();
@@ -268,7 +268,6 @@ function altUp() {
 
 function keyDown(event) {
   event.preventDefault();
-  if (event.repeat === true) return;
   const k = findKey(event.code);
   if (k === null) return;
   if (k.key !== 'CapsLock') document.querySelector(`#${event.code}`).classList.add('pressed');
@@ -277,16 +276,16 @@ function keyDown(event) {
     if (shiftState === 0) s = k.name;
     else s = k.nameShift;
     insertSymbols(s);
-  } else if (!event.repeat) {
+  } else {
     switch (k.key) {
       case 'Shift':
-        shiftClicked('down');
+        if (!event.repeat) shiftClicked();
         break;
       case 'Alt':
-        altClicked('down');
+        if (!event.repeat) altClicked();
         break;
       case 'CapsLock':
-        capslockClicked();
+        if (!event.repeat) capslockClicked();
         break;
       case ' ':
         spaceClicked();
@@ -312,20 +311,16 @@ function keyDown(event) {
 
 function keyUp(event) {
   event.preventDefault();
-
   const k = findKey(event.code);
   if (k === null) return;
-
   if (k.key !== 'CapsLock') document.querySelector(`#${event.code}`).classList.remove('pressed');
   if (k.property !== 'printable') {
     switch (k.key) {
       case 'Shift':
-        shiftUp('up');
-
+        shiftUp();
         break;
       case 'Alt':
-        altUp('up');
-
+        altUp();
         break;
 
       default:
@@ -336,6 +331,8 @@ function keyUp(event) {
 
 inputText.addEventListener('keydown', keyDown);
 inputText.addEventListener('keyup', keyUp);
+keyboard.addEventListener('keydown', keyDown);
+keyboard.addEventListener('keyup', keyUp);
 btnEnter.addEventListener('click', enterClicked);
 btnTab.addEventListener('click', tabClicked);
 btnDel.addEventListener('click', delClicked);
