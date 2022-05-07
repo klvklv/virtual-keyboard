@@ -71,7 +71,7 @@ div3.appendChild(p1);
 p1.textContent = 'Клавиатура создана в операционной системе Windows';
 
 const p2 = document.createElement('p');
-p2.innerHTML = 'Для переключения языка воспользуйтесь комбинацией <span>Shift + Alt</span> (слева)';
+p2.innerHTML = 'Для переключения языка воспользуйтесь комбинацией <span>Shift + Alt</span>';
 const span = document.createElement('span');
 
 p2.appendChild(span);
@@ -215,28 +215,25 @@ function capslockClicked() {
   btnCapsLock.classList.toggle('pressed');
   btnCapsLock.classList.toggle('dark');
 }
+
 let langswitched = false;
-function shiftClicked(event) {
-  if (langswitched) {
-    if (event === 'up') langswitched = false;
-    return;
-  }
+
+function shiftClicked() {
+  if (langswitched) return; // to prevent multiple case change
   if (altState === 1) {
     langswitched = true;
-    if (event === 'down') {
-      switch (lang) {
-        case 'en':
-          lang = 'ru';
-          break;
-        case 'ru':
-          lang = 'en';
-          break;
+    switch (lang) {
+      case 'en':
+        lang = 'ru';
+        break;
+      case 'ru':
+        lang = 'en';
+        break;
 
-        default:
-          break;
-      }
-      setLang(lang);
+      default:
+        break;
     }
+    setLang(lang);
   } else {
     if (shiftState === 0) shiftState = 1;
     else shiftState = 0;
@@ -244,9 +241,9 @@ function shiftClicked(event) {
   }
 }
 
-function shiftUp(event) {
+function shiftUp() {
   if (langswitched) {
-    if (event === 'up') langswitched = false;
+    langswitched = false;
     return;
   }
   if (shiftState === 0) shiftState = 1;
