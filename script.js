@@ -173,7 +173,6 @@ function insertSymbols(str) {
 
 function btnsClicked(event) {
   const { id } = event.currentTarget;
-  if (findKey(id).location > 0) return;
   if (id === 'Enter' || id === 'Tab' || id === 'Space') return;
   insertSymbols(event.currentTarget.innerHTML);
 }
