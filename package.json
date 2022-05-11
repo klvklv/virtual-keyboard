@@ -1,0 +1,17 @@
+{
+  "name": "virtual-keyboard-en-ru",
+  "version": "1.0.0",
+  "description": "keyboard",
+  "main": "script.js",
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^8.14.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "LK",
+  "license": "ISC"
+}
