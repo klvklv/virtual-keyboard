@@ -137,7 +137,7 @@ const jsonKeyboardEn = [
       name: '-',
       nameShift: '_',
       keyCode: 109,
-      code: 'NumpadSubtract',
+      code: 'Minus',
       location: 3,
       description: 'subtract',
       class: 'size1',
